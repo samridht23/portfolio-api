@@ -44,6 +44,9 @@ const sApi = new SpotifyWebApi({
 
 
 const spotifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   try {
     const refToken = process.env.REFRESH_TOKEN;
     if (refToken) {
