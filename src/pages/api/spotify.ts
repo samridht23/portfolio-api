@@ -45,7 +45,7 @@ const sApi = new SpotifyWebApi({
 
 const spotifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   try {
     const refToken = process.env.REFRESH_TOKEN;
@@ -56,7 +56,7 @@ const spotifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     sApi.setAccessToken(accessToken.body.access_token)
     const state = await sApi.getMyCurrentPlaybackState()
     let resData: ResponseData = {} as ResponseData
-    if (state.body.currently_playing_type === "track") {
+    if (state.body.is_playing && state.body.currently_playing_type === "track") {
       resData.is_playing = state.body.is_playing;
       if (state.body.item) {
         let item = state.body.item as ItemProps;
@@ -69,10 +69,7 @@ const spotifyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         }))
         resData.artist = artists;
       }
-    } else if (
-      state.body.currently_playing_type === "episode" ||
-      state.body.currently_playing_type === "ad"
-    ) {
+    } else {
       const recent = await sApi.getMyRecentlyPlayedTracks({ limit: 1 })
       resData.is_playing = false
       resData.song_name = recent.body.items[0].track.name;
